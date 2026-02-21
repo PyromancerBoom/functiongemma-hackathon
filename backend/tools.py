@@ -146,52 +146,51 @@ def simulate_action(function_name: str, arguments: dict) -> dict:
     """Simulates an action and returns a formatted JSON result for the frontend."""
     
     summary = ""
-    emoji = "✅"
     
     if function_name == "get_weather":
         location = arguments.get("location", "Unknown")
-        summary = f"🌤️ Checked weather in {location} (Mock 72°F)"
+        summary = f"Checked weather in {location} (Mock 72°F)"
     
     elif function_name == "set_alarm":
         hour = arguments.get("hour", 0)
         minute = arguments.get("minute", 0)
         # Format time properly (e.g. 7:00 instead of 7:0)
         time_str = f"{hour:02d}:{minute:02d}"
-        summary = f"⏰ Alarm set for {time_str}"
+        summary = f"Alarm set for {time_str}"
         
     elif function_name == "send_message":
         recipient = arguments.get("recipient", "Unknown")
         msg = arguments.get("message", "")
-        summary = f"💬 Sent message to {recipient}: '{msg}'"
+        summary = f"Sent message to {recipient}: '{msg}'"
         
     elif function_name == "play_music":
         song = arguments.get("song", "something")
-        summary = f"🎵 Playing {song}"
+        summary = f"Playing {song}"
         
     elif function_name == "set_timer":
         minutes = arguments.get("minutes", 0)
-        summary = f"⏱️ Timer set for {minutes} minutes"
+        summary = f"Timer set for {minutes} minutes"
         
     elif function_name == "create_reminder":
         title = arguments.get("title", "something")
         time_val = arguments.get("time", "later")
-        summary = f"📌 Reminder set: {title} at {time_val}"
+        summary = f"Reminder set: {title} at {time_val}"
         
     elif function_name == "search_contacts":
         query = arguments.get("query", "Unknown")
-        summary = f"📇 Found contact info for '{query}'"
+        summary = f"Found contact info for '{query}'"
         
     elif function_name == "open_app":
         app = arguments.get("app_name", "App")
-        summary = f"📱 Opening {app}..."
+        summary = f"Opening {app}..."
         
     elif function_name == "make_call":
         contact = arguments.get("contact", "Unknown")
-        summary = f"📞 Calling {contact}..."
+        summary = f"Calling {contact}..."
         
     else:
         # Fallback for unknown tools
-        summary = f"⚙️ Executed {function_name}"
+        summary = f"Executed {function_name}"
 
     return {
         "tool": function_name,

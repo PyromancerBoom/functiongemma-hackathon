@@ -3,15 +3,15 @@ import InfoPage from './InfoPage.jsx'
 
 // ── Tool icon map ────────────────────────────────────────────────
 const TOOL_ICONS = {
-  get_weather: '🌤',
-  set_alarm: '⏰',
-  send_message: '📨',
-  play_music: '🎵',
-  set_timer: '⏱',
-  create_reminder: '🔔',
-  search_contacts: '🔍',
-  open_app: '📱',
-  make_call: '📞',
+  get_weather: 'W',
+  set_alarm: 'A',
+  send_message: 'M',
+  play_music: 'P',
+  set_timer: 'T',
+  create_reminder: 'R',
+  search_contacts: 'S',
+  open_app: 'O',
+  make_call: 'C',
 }
 
 // ── Source badge ─────────────────────────────────────────────────
@@ -19,7 +19,7 @@ function SourceBadge({ source }) {
   const isLocal = source && source.includes('on-device')
   return (
     <span className={`badge ${isLocal ? 'badge--local' : 'badge--cloud'}`}>
-      {isLocal ? '⚡ on-device' : '☁ cloud'}
+      {isLocal ? 'on-device' : 'cloud'}
     </span>
   )
 }
@@ -44,7 +44,7 @@ function ActionCard({ result }) {
           {actions.map((a, i) => (
             <li key={i} className={`action-item ${a.success ? '' : 'action-item--error'}`}>
               <span className="action-item__icon">
-                {TOOL_ICONS[a.tool] ?? '✓'}
+                {TOOL_ICONS[a.tool] ?? '>'}
               </span>
               <span className="action-item__summary">{a.summary}</span>
             </li>
@@ -54,7 +54,7 @@ function ActionCard({ result }) {
         <ul className="action-card__actions">
           {function_calls.map((fc, i) => (
             <li key={i} className="action-item">
-              <span className="action-item__icon">{TOOL_ICONS[fc.name] ?? '✓'}</span>
+              <span className="action-item__icon">{TOOL_ICONS[fc.name] ?? '>'}</span>
               <span className="action-item__summary">
                 {fc.name}({Object.entries(fc.arguments).map(([k, v]) => `${k}: ${v}`).join(', ')})
               </span>
