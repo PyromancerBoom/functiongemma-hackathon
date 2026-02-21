@@ -4,7 +4,15 @@ sys.path.insert(0, "cactus/python/src")
 functiongemma_path = "cactus/weights/functiongemma-270m-it"
 
 import json, os, time
-from cactus import cactus_init, cactus_complete, cactus_destroy
+
+try:
+    from cactus import cactus_init, cactus_complete, cactus_destroy
+except ModuleNotFoundError:
+    # Running on Windows/environment without cactus. MOCK_MODE will handle fallback
+    cactus_init = None
+    cactus_complete = None
+    cactus_destroy = None
+
 from google import genai
 from google.genai import types
 
@@ -72,7 +80,7 @@ def generate_cloud(messages, tools):
     start_time = time.time()
 
     gemini_response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=contents,
         config=types.GenerateContentConfig(tools=gemini_tools),
     )
