@@ -15,8 +15,9 @@ from elevenlabs.client import ElevenLabs
 # Add parent directory to path so imports work from any working directory
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Load .env BEFORE anything reads env vars
-load_dotenv()
+# Load .env from project root (not from backend/)
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path, verbose=True)
 
 # Import routing strategy and tools
 from main import generate_hybrid, generate_cloud
@@ -134,12 +135,21 @@ def _generate_audio_tts(text: str) -> str:
     Generate audio from text using ElevenLabs TTS API.
     Returns base64-encoded MP3 audio data.
     """
-    if MOCK_MODE or not elevenlabs_client:
+    # Debug: Check what we have
+    print(f"[TTS Debug] MOCK_MODE={MOCK_MODE}, elevenlabs_client={elevenlabs_client is not None}")
+    
+    if MOCK_MODE:
+        print(f"[TTS Debug] Skipping TTS because MOCK_MODE=true")
+        return ""
+    
+    if not elevenlabs_client:
+        print(f"[TTS Debug] Skipping TTS because elevenlabs_client is None")
         return ""
     
     try:
         # Generate speech using ElevenLabs (using default voice "Bella")
         # For faster responses, output format is currently MP3
+        print(f"[TTS Debug] Calling ElevenLabs API with text: {text[:50]}...")
         audio = elevenlabs_client.text_to_speech.convert(
             text=text,
             voice_id="EXAVITQu4vr4xnSDxMaL",  # Bella: Clear, melodic, excellent for instructions
@@ -148,9 +158,12 @@ def _generate_audio_tts(text: str) -> str:
         
         # Convert audio stream to bytes and then to base64
         audio_bytes = b"".join(audio)
+        print(f"[TTS Debug] Generated {len(audio_bytes)} bytes of audio")
         return base64.b64encode(audio_bytes).decode('utf-8')
     except Exception as e:
-        print(f"[TTS Error] {e}")
+        print(f"[TTS Error] {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return ""
 
 
@@ -266,6 +279,30 @@ async def transcribe_and_act(audio: UploadFile = File(...)):
     finally:
         if os.path.exists(tmp.name):
             os.remove(tmp.name)
+
+
+@app.get("/api/test-tts")
+async def test_tts():
+    """
+    Test endpoint for TTS functionality.
+    Hardcoded text, returns audio directly.
+    """
+    sample_text = "Setting alarm for 7 AM. Playing your favorite music. Getting weather for San Francisco."
+    audio_base64 = _generate_audio_tts(sample_text)
+    
+    if not audio_base64:
+        return {
+            "status": "error",
+            "message": "TTS failed - check if ELEVENLABS_API_KEY is set",
+            "audio_base64": "",
+        }
+    
+    return {
+        "status": "success",
+        "text": sample_text,
+        "audio_base64": audio_base64,
+        "audio_url": f"data:audio/mp3;base64,{audio_base64}",
+    }
 
 
 if __name__ == "__main__":
